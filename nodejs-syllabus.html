@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend with Node.js — Manish Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #16161f;
+    --card: #1a1a26;
+    --card-hover: #1e1e2e;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.1);
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+    --accent: #7c6aff;
+    --accent2: #a594ff;
+    --accent-glow: rgba(124,106,255,0.15);
+    --green: #22d3a8;
+    --green-dim: rgba(34,211,168,0.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --coral: #f97066;
+    --coral-dim: rgba(249,112,102,0.1);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.1);
+    --pink: #e879f9;
+    --pink-dim: rgba(232,121,249,0.1);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 100px 24px 80px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,106,255,0.18) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,106,255,0.15);
+    border: 1px solid rgba(124,106,255,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #a594ff 50%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text2);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    font-weight: 400;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    font-feature-settings: "tnum";
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  .stat-divider {
+    width: 1px;
+    background: var(--border2);
+    align-self: stretch;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  /* Section grid */
+  .sections-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    background: var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .section-block {
+    background: var(--bg);
+    padding: 0;
+    transition: background 0.2s;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .section-header:hover {
+    background: var(--card-hover);
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    min-width: 28px;
+  }
+
+  .section-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .section-count {
+    font-size: 12px;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-right: 8px;
+  }
+
+  .chevron {
+    color: var(--text3);
+    font-size: 18px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .section-block.open .chevron {
+    transform: rotate(180deg);
+  }
+
+  .section-lessons {
+    display: none;
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .section-block.open .section-lessons {
+    display: block;
+  }
+
+  .lessons-list {
+    list-style: none;
+    padding-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2px 32px;
+  }
+
+  .lesson-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 13px;
+    color: var(--text2);
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s;
+  }
+
+  .lesson-item:hover {
+    color: var(--text);
+  }
+
+  .lesson-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  /* Color themes per section */
+  .s1 .section-icon { background: var(--green-dim); color: var(--green); }
+  .s2 .section-icon { background: var(--amber-dim); color: var(--amber); }
+  .s3 .section-icon { background: var(--blue-dim); color: var(--blue); }
+  .s4 .section-icon { background: var(--accent-glow); color: var(--accent2); }
+  .s5 .section-icon { background: var(--coral-dim); color: var(--coral); }
+  .s6 .section-icon { background: var(--teal-dim); color: var(--teal); }
+  .s7 .section-icon { background: var(--pink-dim); color: var(--pink); }
+  .s8 .section-icon { background: var(--green-dim); color: var(--green); }
+  .s9 .section-icon { background: var(--blue-dim); color: var(--blue); }
+  .s10 .section-icon { background: var(--amber-dim); color: var(--amber); }
+  .s11 .section-icon { background: var(--accent-glow); color: var(--accent2); }
+  .s12 .section-icon { background: var(--coral-dim); color: var(--coral); }
+  .s13 .section-icon { background: var(--teal-dim); color: var(--teal); }
+  .s14 .section-icon { background: var(--pink-dim); color: var(--pink); }
+  .s15 .section-icon { background: var(--green-dim); color: var(--green); }
+  .s16 .section-icon { background: var(--amber-dim); color: var(--amber); }
+  .s17 .section-icon { background: var(--coral-dim); color: var(--coral); }
+  .s18 .section-icon { background: var(--blue-dim); color: var(--blue); }
+  .s19 .section-icon { background: var(--accent-glow); color: var(--accent2); }
+  .s20 .section-icon { background: var(--teal-dim); color: var(--teal); }
+  .s21 .section-icon { background: var(--pink-dim); color: var(--pink); }
+  .s22 .section-icon { background: var(--green-dim); color: var(--green); }
+  .s23 .section-icon { background: var(--amber-dim); color: var(--amber); }
+  .capstone .section-icon { background: rgba(249,112,102,0.15); color: #f97066; }
+
+  .s1.open .section-header { background: rgba(34,211,168,0.04); }
+  .s4.open .section-header, .s11.open .section-header, .s19.open .section-header { background: rgba(124,106,255,0.04); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 13px;
+  }
+
+  footer a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+
+  /* Share button */
+  .share-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .share-bar-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+
+  .share-bar-title span {
+    color: var(--text);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+
+  .btn-ghost {
+    background: var(--bg3);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-ghost:hover { background: var(--card); color: var(--text); }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Expand all */
+  .expand-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .section-count-label {
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  .copy-toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 100px;
+    transition: transform 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .copy-toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 36px; }
+    .hero-stats { gap: 20px; }
+    .stat-divider { display: none; }
+    .lessons-list { grid-template-columns: 1fr; }
+    .share-bar { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="share-bar">
+  <div class="share-bar-title"><span>Backend with Node.js</span> — by Manish Kumar</div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="toggleAll()">Expand all</button>
+    <button class="btn btn-primary" onclick="copyLink()">🔗 Copy link</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">Manish Kumar · 2024–2025</div>
+  <h1>Backend with Node.js</h1>
+  <p class="hero-sub">From absolute zero to production-ready systems — networking, databases, auth, cloud, CI/CD, and more.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">23</div>
+      <div class="stat-label">Sections</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">500+</div>
+      <div class="stat-label">Lessons</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Capstone Project</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Things to build</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="expand-controls">
+    <div class="section-count-label">23 sections · click any to expand</div>
+  </div>
+
+  <div class="sections-grid" id="grid">
+
+    <!-- S1 -->
+    <div class="section-block s1" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <div class="section-icon">🚀</div>
+        <span class="section-title">Introduction to Backend and Node.js</span>
+        <span class="section-count">8 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Prerequisites</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Backend & Client Server Architecture?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>CLI vs GUI</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Node.js and What Is It Used For?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Installing Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Running Our First Node.js Code</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Why Do We Need Node.js vs Browser JavaScript?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>A Brief History of Node.js</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="section-block s2" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <div class="section-icon">💻</div>
+        <span class="section-title">Basics of Terminal</span>
+        <span class="section-count">10 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Terminal and Shell</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Basic Shell Commands (echo, pwd, whoami)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Navigating the File System (cd)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Listing Directory Contents (ls)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating, Copying, Moving, Deleting Files (touch, mkdir, cp, mv, rm)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Viewing and Editing Files (cat, nano, vim)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Prompt in Terminal?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Configuring Terminal Using .bashrc</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Using Aliases for Command Shortcuts</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="section-block s3" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <div class="section-icon">⚙️</div>
+        <span class="section-title">Basics of OS</span>
+        <span class="section-count">14 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is CPU, Processor, and Core?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is OS and Kernel?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is a Process?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Thread, Concurrency, and Parallelism</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Can a Process Exist Without a Thread?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Debugging Worker Threads</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is an Environment Variable?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Setting and Using Environment Variables</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Installing Windows Subsystem for Linux (WSL)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding the Path System: Windows vs Linux</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What are Executable Files?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Managing File Permissions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How Commands Get Executed?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Important Methods of the Process Object</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="section-block s4" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <div class="section-icon">📦</div>
+        <span class="section-title">Fundamentals of Node.js</span>
+        <span class="section-count">25 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Module System in Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to CommonJS Module System</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>module.exports VS exports</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>module Object & Module Wrapper Function</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Custom Require Function</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>ES6 Modules</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Accessing __filename and __dirname in ES6</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Why Different Module Systems?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Difference Between CommonJS and ES6 Modules</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Different Types of Modules</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>NPM and NPM Modules</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating and Publishing NPM Modules</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding package.json In Depth</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Shebang?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Library VS CLI Packages, Local VS Global</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How npx Works / What is npx?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to FS Module</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Word Counter CLI Project</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Writing to a File Using Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Node.js File Operations: Rename, Delete, Move, Copy</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="section-block s5" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <div class="section-icon">🔢</div>
+        <span class="section-title">Data Representation in Computing</span>
+        <span class="section-count">15 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Data Representation</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Decimal, Octal, Hexadecimal, Binary Number Systems</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introducing Programmer's Calculator</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Digital Data Units</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Binary Data on Physical Level</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Character Sets vs Character Encodings (ASCII, Unicode)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding UTF-8 in Depth</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What are Unicode Planes?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>UTF-8 vs UTF-16 vs UTF-32</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Byte Order Mark (BOM) and Endianness</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="section-block s6" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <div class="section-icon">🧮</div>
+        <span class="section-title">Mastering Buffers — Binary Data in Node.js</span>
+        <span class="section-count">18 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Buffers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>ArrayBuffer in JavaScript</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Signed and Unsigned Values</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Reading and Writing to Array Buffers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Writing Multi-Byte Data & Typed Arrays</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Transferring ArrayBuffer Data to Disk and Network</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Buffer in Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Alloc VS AllocUnsafe</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Buffer Pool in Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Buffer Methods and Properties</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Practical Use of Buffers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Limitations of Buffers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Base-64 Encoding / Base-64 in Node.js</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S7 -->
+    <div class="section-block s7" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <div class="section-icon">⚡</div>
+        <span class="section-title">Event-Driven Architecture & EventEmitter</span>
+        <span class="section-count">6 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>What is an I/O Operation?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Async I/O?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Event-Driven Architecture</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>The EventEmitter Class</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating and Emitting Events</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>EventEmitter Methods</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S8 -->
+    <div class="section-block s8" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <div class="section-icon">🌊</div>
+        <span class="section-title">Node.js Streams — Handling Data Flow like a Pro</span>
+        <span class="section-count">30 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Types Of Streams in Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Readable Streams & Their States</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Internal Buffer of Readable Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Writable Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Backpressure and Internal Buffer of Writable Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Closing & States of Writable Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Piping Streams / Piping Using Pipeline</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Duplex, Transform and Passthrough Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Data Streams & Piping/Redirection</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Writing 1 Lakh Numbers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Why Streams Are So Fast?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is a File Descriptor?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Reading Files with File Descriptor</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Opening Files in Different Modes</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Write 1 Lakh Numbers Faster Than Streams</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Implementing Internal Buffer in Custom Stream</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Handling Files Using Promises</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How Browsers Use Streams? / Streams in JavaScript</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S9 -->
+    <div class="section-block s9" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <div class="section-icon">🌐</div>
+        <span class="section-title">Basics of Computer Networking</span>
+        <span class="section-count">45 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Why Should We Learn Networking?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Computer Networking?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Story of The Internet / DNS / World Wide Web</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Important Networking Devices</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Types of Network / Creating LAN and WAN</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How Internet Comes to Our Homes?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How does Mobile Internet Work?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding IPv4 Addresses in Depth</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Dynamic vs Static IP / Private vs Public IP</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Turning Our Laptop into a Public Server</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding Domain Name System (DNS)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Connecting IP Address with a Domain Name</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How DNS Servers Work? / DNS Hijacking</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding IPv6 Addresses</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Port Numbers / Network Interfaces / MAC Address</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Firewall?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding OSI Model and TCP/IP Model</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Network Topologies</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>TCP and UDP: The Backbone of the Internet</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Remote Terminal Access Using SSH</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Transferring Files via SCP / SSH Keys</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating AWS Account / EC2 Instance / Cost Management</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S10 -->
+    <div class="section-block s10" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <div class="section-icon">🔌</div>
+        <span class="section-title">Networking with Core Node.js Modules</span>
+        <span class="section-count">30 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Networking Capabilities of Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating UDP Server / Transferring Files via UDP</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Socket?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating TCP Server and Client</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Handling Multiple TCP Clients</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Transferring Files Using TCP</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating HTTP Server using Net Module</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding HTTP Headers / Response Headers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Controlling Data Transfer Speeds</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Why We Await Twice When Making a Fetch Call?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Uploading Files</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating HTTP Server Using HTTP Module</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>HTTP Request Methods / Status Codes</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Client-Side vs Server-Side Rendering</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating Online Storage Platform Like Google Drive</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Preview/Download, File Upload Progress, Delete, Rename</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Making Our App Live on Internet</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S11 -->
+    <div class="section-block s11" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <div class="section-icon">🛣️</div>
+        <span class="section-title">Building RESTful CRUD APIs with Express.js</span>
+        <span class="section-count">50 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Intro to Express.js / How Express Works</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Middleware in Express?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Handling Different HTTP Methods</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Global and Route-Specific Middleware</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Serving Static Files / Sending JSON</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Dynamic Routing / Handling File Uploads</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is CORS? / Understanding Preflight</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Virtual File System (VFS) — Create, Integrate, Extend</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding REST API Principles</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Error Handling in Express</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Handling File Uploads Using Multer</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>User Registration, Login, Cookies, Sessions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding Path Traversal Vulnerability</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Organizing Routes with Express Router</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>HTTP Redirection / Form Data Types / CSRF</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Nested Dynamic Routes / RegEx in Routes</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Express v4 vs v5</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S12 -->
+    <div class="section-block s12" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">12</span>
+        <div class="section-icon">🍃</div>
+        <span class="section-title">Mastering Database Fundamentals with MongoDB</span>
+        <span class="section-count">55 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction To Databases / Types Of Databases</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction To MongoDB / Mongo Shell</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>MongoDB Fundamentals / CRUD Operations</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Datatypes / BSON Types / Object Id</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Where Data Is Stored / Configuring MongoDB</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Running MongoShell Scripts in JS Files</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>MongoDB in Node.js / Cursors / Projection</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating Database in StorageApp</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Bulk Operations / Recursive Directory Delete</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Schema Validation / JSON Schema / Validation Actions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Are Transactions? ACID Properties</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Relational vs Non-Relational Databases</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Embedded vs Referenced Documents</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>One-to-One, One-to-Many, Many-to-Many</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Backup/Restore (mongodump, mongoimport)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Securing MongoDB: Auth and Authorization</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Deploying MongoDB on AWS EC2 / MongoDB Atlas</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S13 -->
+    <div class="section-block s13" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">13</span>
+        <div class="section-icon">🏗️</div>
+        <span class="section-title">Mastering MVC Architecture with Mongoose</span>
+        <span class="section-count">30 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to MVC Architecture</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Controllers, Views, Models</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Mongoose / Query Buffering</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Schema and Types / CRUD with Mongoose</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What are Thenable Objects? / Mongoose Queries</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating Mongoose in TodoApp and StorageApp</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Custom Validation in Mongoose Schema</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Ref and Populate to Fetch Referenced Fields</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Virtuals / Custom Document Methods / Static Methods</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Middleware in Mongoose (Document, Query, Model)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Indexes in MongoDB / Unique Indexes</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Document Versioning in Mongoose</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Built-in Error Types (ValidationError, MongoServerError)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S14 -->
+    <div class="section-block s14" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">14</span>
+        <div class="section-icon">🔐</div>
+        <span class="section-title">Mastering Authentication and Authorization</span>
+        <span class="section-count">55 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Stateful vs Stateless Auth</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Cryptography: Encryption vs Hashing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Hashing in Node.js / How Git Uses Hashing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Digital Signatures / Signing Cookies / HMAC</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Hashing Passwords / Rainbow Tables / KDF</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Using pbkdf2() and bcrypt to Hash Passwords</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding JSON Web Tokens (JWT)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Are Sessions? / Stateful vs Stateless Servers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Guest Sessions / Cart / Authorized Sessions (LMS)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Session Expiry / Auto-Deleting Documents</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Implementing Sessions in StorageApp</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Restricting Multiple Device Access</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Sending Emails / Verifying Email via OTP</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding OAuth 2.0 / OpenID Connect</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Implementing Login With Google (full flow)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Passport.js / Implicit Grant Type / One Tap Login</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>GSI vs FedCM / Branding Guidelines</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Adding Google Login in StorageApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S15 -->
+    <div class="section-block s15" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">15</span>
+        <div class="section-icon">👥</div>
+        <span class="section-title">Role-Based Access Control (RBAC)</span>
+        <span class="section-count">9 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is RBAC?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Implementing GET All Users Endpoint</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Adding Role-Based Access in Users Route</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Role-Based UI Rendering</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>User Logout / Delete / Soft Delete</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Preventing Self-Deletion</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is Google Zanzibar and OpenFGA?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>RBAC Assignments for StorageApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S16 -->
+    <div class="section-block s16" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">16</span>
+        <div class="section-icon">⚡</div>
+        <span class="section-title">Working with Redis — Caching, Sessions & Beyond</span>
+        <span class="section-count">28 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Redis / Installing Redis</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Data Types in Redis (Strings, Lists, Sets, Hashes)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Time-to-Live (TTL) / Key Expiry</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Database Management / Namespacing Keys</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Connecting Redis in Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Working with RedisJSON / Redis vs MongoDB Speed Test</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Using Redis for Caching / As Session Store</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding Redis Search and Indexing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Fuzzy Search / SCAN vs KEYS Commands</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Real-Time Messaging with Redis Pub/Sub</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Enabling Auth / Eviction Policies / Redis Cloud</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S17 -->
+    <div class="section-block s17" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">17</span>
+        <div class="section-icon">🛡️</div>
+        <span class="section-title">Securing Our Node.js Application</span>
+        <span class="section-count">40 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Using .env File Natively / Storing Sensitive Info</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding SQL Injection Vulnerability</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Schema-Based Data Validation with Zod</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding Same-Origin Policy</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>XSS Attacks in Practice / Fix with DOMPurify</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Types of XSS: Reflected, DOM-Based, Stored</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Content Security Policy (CSP) in Depth</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Inline Scripts with Hash and Nonce</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Clickjacking? / SameSite Cookie Attribute</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Cross-Site Request Forgery (CSRF) — Attacks & Prevention</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Denial of Service / Rate Limiting / Throttling</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>DDoS / Security Headers / Helmet.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Dynamic & Adaptive Throttling</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Dependency Vulnerabilities</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S18 -->
+    <div class="section-block s18" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">18</span>
+        <div class="section-icon">☁️</div>
+        <span class="section-title">Cloud Storage Integration with AWS S3</span>
+        <span class="section-count">30 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to AWS S3 / Benefits of S3</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>AWS CLI Introduction / Working with S3 via CLI</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Managing Bucket Policy / AWS CloudShell</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding Signed URLs in S3</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Identity and Access Management (IAM)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>AWS S3 SDK Setup in Node.js / S3 CRUD Operations</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Showing S3 Upload Progress</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating GET and PUT Signed URLs</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>S3 Storage Classes and Pricing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>CloudFront CDN / Cache Invalidation / Signed URLs</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating S3 and CloudFront in StorageApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S19 -->
+    <div class="section-block s19" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">19</span>
+        <div class="section-icon">💳</div>
+        <span class="section-title">Razorpay and Stripe Payment Gateway Integration</span>
+        <span class="section-count">45 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Payment Gateway</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating Razorpay & Stripe Accounts</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Different Ways to Accept Payments</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Receiving Payments via Code in Razorpay</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Razorpay Orders / Payment States / API Guide</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating Razorpay in React and Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Stripe API / Core Resources</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Checkout Sessions / Payment Intents / Charges</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating Stripe in React and Node.js</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What is a Webhook? / Using ngrok for Testing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Verifying Webhook Signatures / Retry Logic</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Razorpay Subscriptions / Stripe Subscriptions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Customer Portal in Stripe</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Integrating Razorpay in StorageApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S20 -->
+    <div class="section-block s20" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">20</span>
+        <div class="section-icon">🚢</div>
+        <span class="section-title">Mastering Deployment and CI/CD Pipelines</span>
+        <span class="section-count">40 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>One Click Deployment with Netlify and Render</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Deploying Node.js Backend on AWS EC2</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding PM2 / Background Process Management</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is NGINX? / NGINX Configuration Deep Dive</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>NGINX as a Reverse Proxy for Node.js Apps</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>NGINX Logs: Access Logs and Error Logs</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>HTTP to HTTPS / SSL Certificates</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Deploying React App on EC2 + S3/CloudFront</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Custom Domain + SSL via ACM / Cloudflare DNS</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to CI/CD / What Is DevOps?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Automating Deployments with Bash Scripting</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Custom CI/CD Pipeline Using Node.js + GitHub Webhooks</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Zero Downtime Deployment with PM2 Cluster Mode</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is GitHub Actions? / Jobs, Actions, Contexts</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>CI/CD Pipeline for Frontend and Backend (GitHub Actions)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Setting Up Self-Hosted Runners</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S21 -->
+    <div class="section-block s21" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">21</span>
+        <div class="section-icon">λ</div>
+        <span class="section-title">Serverless Computing with AWS Lambda</span>
+        <span class="section-count">18 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Serverless Computing?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction To AWS Lambda Functions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Checking AWS Lambda Logs In CloudWatch</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Developing AWS Lambda Locally</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating A Todo API Using AWS Lambda</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Lifecycle Of A Lambda Function</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Connecting A Database In AWS Lambda</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating An Express App With AWS Lambda</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding AWS API Gateway</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Deploying StorageApp On AWS Lambda</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>AWS Lambda And API Gateway Pricing</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction To Serverless Framework</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S22 -->
+    <div class="section-block s22" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">22</span>
+        <div class="section-icon">📊</div>
+        <span class="section-title">Observability Fundamentals for Production Systems</span>
+        <span class="section-count">65 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Observability (O11y)? / Monitoring vs O11y</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>The Three Pillars of Observability</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Telemetry? / LGTM Stack Overview</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Are Metrics and Alerts? / Four Golden Signals</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Prometheus / Installing Prometheus</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Instrumenting Express App for Prometheus</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Custom Metrics / Histograms / PromQL</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Label Filtering / Rate, Increase, Aggregation in PromQL</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is Percentile? / Latency Percentiles</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating Alerts / Prometheus Alertmanager</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Grafana / Creating Dashboards</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Logging / Logging with Pino</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Log Levels / Transports / Child Loggers</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Redacting Sensitive Data / Pino HTTP</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Getting Started with Loki / Sending Logs to Loki</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Connecting Loki with Grafana / Understanding LogQL</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Sending Logs via Alloy / Log Rotation and Retention</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction to Traces / What Is OpenTelemetry?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Adding OTel SDK to Express / Getting Started with Tempo</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Linking Logs ↔ Traces in Grafana</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Connecting Metrics and Traces via Exemplars</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Implementing Observability in StorageApp</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is SLA?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S23 -->
+    <div class="section-block s23" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num">23</span>
+        <div class="section-icon">🔬</div>
+        <span class="section-title">Node.js Under the Hood</span>
+        <span class="section-count">10 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Overview of Node.js Architecture</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Understanding the V8 JavaScript Engine</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Exploring the Node.js Source Code Repository</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is libuv and Its Role in Node.js?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How libuv Handles Asynchronous I/O</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Exploring the Thread Pool in libuv</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>What Is the Event Loop, and Why Is It Important?</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Phases of the Event Loop</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>How Node.js Interacts with C++ Code</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Garbage Collection in V8</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Capstone -->
+    <div class="section-block capstone" onclick="toggle(this)">
+      <div class="section-header">
+        <span class="section-num" style="color: #f97066;">★</span>
+        <div class="section-icon">🎓</div>
+        <span class="section-title" style="color: #fff; font-weight: 600;">Capstone Project: Building ProCodrr.com from Scratch</span>
+        <span class="section-count">41 lessons</span>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-lessons">
+        <ul class="lessons-list">
+          <li class="lesson-item"><span class="lesson-dot"></span>Introduction & Project Overview</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Setting Up the Development Environment</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>User Authentication and Authorization System</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>User Registration and Login</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Role-Based Access Control (Students vs. Creators)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creating the Course Management System</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Designing the Database Schema for Courses</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Creator Dashboards for Course Management</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Adding Course Content (Videos, Documents, Pricing)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Course Categorization and Tagging</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Video Processing with ffmpeg</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Student Dashboard / Course Purchase and Enrollment</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Tracking Student Progress</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Payment Systems (Razorpay, Stripe, PayPal)</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Video Streaming, Content Security, DRM Protection</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Downloadable Resources</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Admin Panel: Users, Courses, Transactions</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Platform Analytics and Reports</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Search, Filters, Coupon Codes</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Email and In-App Notifications</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Caching, Load Balancing, Clustering</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Deploying on AWS / Environment Variables in Production</li>
+          <li class="lesson-item"><span class="lesson-dot"></span>Post-Launch Monitoring and Maintenance</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>Backend with Node.js · <a href="https://procodrr.com" target="_blank">Manish Kumar</a> · Full-stack course</p>
+</footer>
+
+<div class="copy-toast" id="toast">✓ Link copied to clipboard</div>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('open');
+  }
+
+  let allOpen = false;
+  function toggleAll() {
+    const blocks = document.querySelectorAll('.section-block');
+    allOpen = !allOpen;
+    blocks.forEach(b => allOpen ? b.classList.add('open') : b.classList.remove('open'));
+    document.querySelector('.btn-ghost').textContent = allOpen ? 'Collapse all' : 'Expand all';
+  }
+
+  function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  }
+</script>
+</body>
+</html>
